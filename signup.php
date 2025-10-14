@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login</title>
+    <title>Sign up</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -73,32 +73,40 @@
       <div class="card-form">
         <div class="card-head d-flex align-items-center">
           <div class="flex-grow-1">
-            <h2 class="mb-0">Sign In</h2>
+            <h2 class="mb-0">Create an account</h2>
           </div>
         </div>
 
         <div class="card-body">
-          <form action="php/login_cont.php" method="POST" novalidate>
+          <form name="signup" action="php/signup_cont.php" method="POST" onsubmit="return confirmPass()" novalidate>
+
             <div class="mb-3">
               <label for="inputEmail" class="form-label">Email address</label>
-              <input type="email" class="form-control" id="inputEmail" name="email" placeholder="name@example.com" required>
-              <div class="invalid-feedback">Please provide a valid email.</div>
+              <input type="email" class="form-control" id="inputEmail" name="inputEmail" placeholder="name@example.com" required>
+              <div class="invalid-feedback">Please enter a valid email.</div>
             </div>
 
             <div class="mb-3">
               <label for="inputPassword" class="form-label">Password</label>
-              <input type="password" id="inputPassword" name="pass" class="form-control" required>
+              <input type="password" id="inputPassword" name="inputPassword" class="form-control" minlength="8" required>
+              <div id="pwHelp" class="form-text pw-hint">Minimum 8 characters. Use letters and numbers.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="inputConfirmPassword" class="form-label">Confirm password</label>
+              <input type="password" id="inputConfirmPassword" class="form-control" required>
+              <div id="message" class="form-text text-danger mt-1" aria-live="polite"></div>
             </div>
 
             <div class="d-grid mb-3">
-              <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
+              <button type="submit" class="btn btn-primary btn-lg">Create account</button>
             </div>
 
             <div class="divider"></div>
 
             <div class="text-center">
-              <small class="text-muted">Don't have an account?</small>
-              <div><a href="signup.php">Create account</a></div>
+              <small class="text-muted">Already have an account?</small>
+              <div><a href="login.php">Log in</a></div>
             </div>
 
             <?php if (!empty($error)): ?>
@@ -106,10 +114,25 @@
                 <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
               </div>
             <?php endif; ?>
+
           </form>
         </div>
       </div>
     </main>
+
+    <script>
+      function confirmPass() { 
+        const pass = document.forms["signup"]["inputPassword"].value;
+        const confirmPass = document.forms["signup"]["inputConfirmPassword"].value;
+        const msg = document.getElementById("message");
+        msg.innerHTML = "";
+        if (pass !== confirmPass) {
+          msg.innerHTML = "Passwords don't match!";
+          return false;
+        }
+        return true;
+      }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   </body>
