@@ -78,7 +78,7 @@
         </div>
 
         <div class="card-body">
-          <form name="signup" action="php/signup_cont.php" method="POST" onsubmit="return confirmPass()" novalidate>
+          <form name="signup" action="php/signup_cont.php" method="POST" onsubmit="return confirmPass()">
 
             <div class="mb-3">
               <label for="inputEmail" class="form-label">Email address</label>

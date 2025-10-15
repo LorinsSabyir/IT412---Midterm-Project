@@ -1,22 +1,30 @@
 <?php 
+session_start();
 include 'db.php';
 
-// gather user input
 $email = $_POST["email"];
 $pass = $_POST["pass"];
 
-$sql = "SELECT email, pass FROM $tableName WHERE email = '$email' AND pass = '$pass'";
+$sql = "SELECT email, pass FROM $tableName WHERE email = '$email'";
 $result = mysqli_query($conn, $sql);
 
-// checks if the record is inserted
-if (mysqli_num_rows($result) > 0) {
-  header("Location: ../index.html");
-  exit();
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $hashedPassword = $row['pass'];
+
+    if (password_verify($pass, $hashedPassword)) {
+        header("Location: ../index.html");
+        exit();
+    } else {
+        $_SESSION['error'] = "Invalid email or password.";
+        header("Location: ../login.php");
+        exit();
+    }
 } else {
-  $error = "Invalid email or password.";
+    $_SESSION['error'] = "Invalid email or password.";
+    header("Location: ../login.php");
+    exit();
 }
 
-// closes the sql connection
 mysqli_close($conn);
-
 ?>
