@@ -78,7 +78,7 @@
         </div>
 
         <div class="card-body">
-          <form action="php/login_cont.php" method="POST" novalidate>
+          <form action="php/login_cont.php" method="POST">
             <div class="mb-3">
               <label for="inputEmail" class="form-label">Email address</label>
               <input type="email" class="form-control" id="inputEmail" name="email" placeholder="name@example.com" required>
