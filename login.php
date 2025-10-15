@@ -1,3 +1,12 @@
+<?php
+  session_start();
+  $error = '';
+  if (isset($_SESSION['error'])) {
+      $error = $_SESSION['error'];
+      unset($_SESSION['error']); // clear message after displaying
+  }
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -106,6 +115,7 @@
                 <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
               </div>
             <?php endif; ?>
+
           </form>
         </div>
       </div>
