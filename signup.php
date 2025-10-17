@@ -89,7 +89,6 @@
             <div class="mb-3">
               <label for="inputPassword" class="form-label">Password</label>
               <input type="password" id="inputPassword" name="inputPassword" class="form-control" minlength="8" required>
-              <div id="pwHelp" class="form-text pw-hint">Minimum 8 characters. Use letters and numbers.</div>
             </div>
 
             <div class="mb-3">

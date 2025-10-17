@@ -1,19 +1,26 @@
 <?php
-include 'db.php';
+require_once('db.php');
 
 // gather user input
 $email = $_POST["inputEmail"];
-$password = password_hash($_POST["inputPassword"], PASSWORD_DEFAULT);
+$password = sha1($_POST["inputPassword"]);
 
-$sql = "INSERT INTO $tableName (email, pass) VALUES ('$email', '$password')";
+// Check if email already exists
+$check = mysqli_query($conn, "SELECT email FROM $table WHERE email = '$email'");
+if ($check && mysqli_num_rows($check) > 0) {
+  echo "<script>console.error('Email already exists');</script>";
+  exit;
+}
+
+// Insert a new record
+$signup = mysqli_query($conn, "INSERT INTO $table (email, pass) VALUES ('$email', '$password')");
 
 // checks if the record is inserted
-if (mysqli_query($conn, $sql)) {
-  echo "<script>console.log('New record created successfully');</script>";
-
+if ($signup) {
   // redirect to signin.php
   header("Location: ../login.php");
   exit;
+
 } else {
   // log error message to console
   $error = addslashes(mysqli_error($conn));

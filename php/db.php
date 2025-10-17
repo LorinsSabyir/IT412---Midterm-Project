@@ -3,43 +3,47 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 
-// helper function to log to browser console
-function console_log($msg) {
-  echo "<script>console.log(" . json_encode($msg) . ");</script>";
-}
+$db = "midterm";
+$table = "user";
 
-// create connection
+// Create connection
 $conn = mysqli_connect($servername, $username, $password);
 
-// check connection
+// Check connection
 if (!$conn) {
-  console_log("Connection failed: " . mysqli_connect_error());
-  die();
-} else {
-  console_log("Connected successfully");
+  die("Connection failed: " . mysqli_connect_error());
 }
 
-// checks if database exists; if not, create one
-$dbName = "midterm";
-$dbResult = mysqli_query($conn, "SHOW DATABASES LIKE '$dbName';");
-
-if ($dbResult && mysqli_num_rows($dbResult) > 0) {
-  console_log("Database '$dbName' exists");
-} else {
-  console_log("Database '$dbName' does not exist");
-  $createDb = "CREATE DATABASE $dbName";
-
-  if (mysqli_query($conn, $createDb)) {
-    console_log("Database created successfully");
+// Check if database exists
+$dbResult = mysqli_query($conn, "SHOW DATABASES LIKE '$db'");
+if (!$dbResult || mysqli_num_rows($dbResult) == 0) {
+  // Create database if not found
+  if (mysqli_query($conn, "CREATE DATABASE $db")) {
+    echo "<script>console.log('Database $db created successfully');</script>";
   } else {
-    console_log("Error creating database: " . mysqli_error($conn));
+    echo "<script>console.error('Error creating database: " . addslashes(mysqli_error($conn)) . "');</script>";
   }
 }
 
-// select the database
-mysqli_query($conn, "USE $dbName");
+// Select the database
+mysqli_select_db($conn, $db);
 
-// checks if table 'user' exists; if not, create one
-$tableName = "user";
+// Check if table exists
+$tableResult = mysqli_query($conn, "SHOW TABLES LIKE '$table'");
+if (!$tableResult || mysqli_num_rows($tableResult) == 0) {
+  // Create table if not found
+  $createTableSQL = "CREATE TABLE `$table` (
+    id INT(6) AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(32) NOT NULL,
+    pass VARCHAR(32) NOT NULL,
+    salt VARCHAR(32)
+  )";
+
+  if (mysqli_query($conn, $createTableSQL)) {
+    echo "<script>console.log('Table $table created successfully inside database $db');</script>";
+  } else {
+    echo "<script>console.error('Error creating table: " . addslashes(mysqli_error($conn)) . "');</script>";
+  }
+}
 
 ?>
