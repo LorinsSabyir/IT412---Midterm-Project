@@ -1,30 +1,37 @@
-<?php 
+<?php
 session_start();
-include 'db.php';
+require_once('db.php');
 
-$email = $_POST["email"];
-$pass = $_POST["pass"];
+$pepper = "SECRET_PEPPER_123";
 
-$sql = "SELECT email, pass FROM $tableName WHERE email = '$email'";
-$result = mysqli_query($conn, $sql);
+$email = mysqli_real_escape_string($conn, $_POST['email']);
+$password = $_POST['pass'];
 
-if ($result && mysqli_num_rows($result) > 0) {
+$query = "SELECT id, pass, salt FROM $table WHERE email = '$email' LIMIT 1";
+$result = mysqli_query($conn, $query);
+
+if ($result && mysqli_num_rows($result) === 1) {
     $row = mysqli_fetch_assoc($result);
-    $hashedPassword = $row['pass'];
+    $salt = $row['salt'];
+    $stored_hash = $row['pass'];
 
-    if (password_verify($pass, $hashedPassword)) {
-        header("Location: ../index.html");
+    // Apply same combination
+    $peppered = hash_hmac("sha256", $password, $pepper);
+    $salted = $peppered . $salt;
+
+    if (password_verify($salted, $stored_hash)) {
+        $_SESSION['user_id'] = $row['id'];
+        header("Location: ../index.php");
         exit();
     } else {
-        $_SESSION['error'] = "Invalid email or password.";
+        $_SESSION['error'] = "Invalid password.";
         header("Location: ../login.php");
         exit();
     }
 } else {
-    $_SESSION['error'] = "Invalid email or password.";
+    $_SESSION['error'] = "Invalid email.";
     header("Location: ../login.php");
     exit();
 }
 
-mysqli_close($conn);
 ?>

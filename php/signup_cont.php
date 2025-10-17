@@ -1,25 +1,30 @@
 <?php
-include 'db.php';
+require_once('db.php');
 
-// gather user input
-$email = $_POST["inputEmail"];
-$password = password_hash($_POST["inputPassword"], PASSWORD_DEFAULT);
+$pepper = "SECRET_PEPPER_123";
 
-$sql = "INSERT INTO $tableName (email, pass) VALUES ('$email', '$password')";
+$email = mysqli_real_escape_string($conn, $_POST['inputEmail']);
+$password = $_POST['inputPassword'];
 
-// checks if the record is inserted
+// Generate unique salt per user
+$salt = bin2hex(random_bytes(8));
+
+// Combine password with pepper
+$peppered = hash_hmac("sha256", $password, $pepper);
+
+// Add salt
+$salted = $peppered . $salt;
+
+// Hash final
+$hashedPassword = password_hash($salted, PASSWORD_BCRYPT);
+
+// Insert user
+$sql = "INSERT INTO $table (email, pass, salt) VALUES ('$email', '$hashedPassword', '$salt')";
 if (mysqli_query($conn, $sql)) {
-  echo "<script>console.log('New record created successfully');</script>";
-
-  // redirect to signin.php
   header("Location: ../login.php");
-  exit;
+  exit();
 } else {
-  // log error message to console
-  $error = addslashes(mysqli_error($conn));
-  echo "<script>console.error('Error inserting record: $error');</script>";
+  header("Location: ../signup.php");
+  exit();
 }
-
-// closes the sql connection
-mysqli_close($conn);
 ?>
