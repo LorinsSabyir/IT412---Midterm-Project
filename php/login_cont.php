@@ -4,17 +4,29 @@ require_once('db.php');
 
 // gather user input
 $email = $_POST["email"];
-$pass = sha1($_POST["pass"]); // still works but better to use password_hash() later
+$password = $_POST["pass"];
 
-// Query user
-$loginResult = mysqli_query($conn, "SELECT email, pass FROM $table WHERE email = '$email' AND pass = '$pass'");
+// query user
+$result = mysqli_query($conn, "SELECT pass FROM $table WHERE email = '$email'");
 
-// Check if user found
-if ($loginResult && mysqli_num_rows($loginResult) > 0) {
-    header("Location: ../index.html");
-    exit();
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $hashedPassword = $row['pass'];
+
+    // verify password securely
+    if (password_verify($password, $hashedPassword)) {
+        // ✅ login success
+        header("Location: ../index.html");
+        exit();
+    } else {
+        // ❌ invalid password
+        $_SESSION['error'] = "Invalid password.";
+        header("Location: ../login.php");
+        exit();
+    }
 } else {
-    $_SESSION['error'] = "Invalid email or password.";
+    // ❌ email not found
+    $_SESSION['error'] = "Invalid email.";
     header("Location: ../login.php");
     exit();
 }
