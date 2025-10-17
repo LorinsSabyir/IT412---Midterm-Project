@@ -1,30 +1,30 @@
 <?php
 require_once('db.php');
 
-// gather user input
-$email = $_POST["inputEmail"];
-$password = $_POST["inputPassword"];
+$pepper = "SECRET_PEPPER_123";
 
-// hash the password securely
-$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+$email = mysqli_real_escape_string($conn, $_POST['inputEmail']);
+$password = $_POST['inputPassword'];
 
-// check if email already exists
-$check = mysqli_query($conn, "SELECT email FROM $table WHERE email = '$email'");
-if ($check && mysqli_num_rows($check) > 0) {
-  header("Location: ../signup.php");
-  exit;
-}
+// Generate unique salt per user
+$salt = bin2hex(random_bytes(8));
 
-// insert new user
-$signup = mysqli_query($conn, "INSERT INTO $table (email, pass) VALUES ('$email', '$hashedPassword')");
+// Combine password with pepper
+$peppered = hash_hmac("sha256", $password, $pepper);
 
-if ($signup) {
+// Add salt
+$salted = $peppered . $salt;
+
+// Hash final
+$hashedPassword = password_hash($salted, PASSWORD_BCRYPT);
+
+// Insert user
+$sql = "INSERT INTO $table (email, pass, salt) VALUES ('$email', '$hashedPassword', '$salt')";
+if (mysqli_query($conn, $sql)) {
   header("Location: ../login.php");
-  exit;
+  exit();
 } else {
-  $error = addslashes(mysqli_error($conn));
-  echo "<script>console.error('Error inserting record: $error');</script>";
+  header("Location: ../signup.php");
+  exit();
 }
-
-mysqli_close($conn);
 ?>
